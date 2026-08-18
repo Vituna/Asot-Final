@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Drawing.Drawing2D;
@@ -76,6 +77,9 @@ public sealed class EditorForm : Form
     private readonly TextBox _trustTitle = new();
     private readonly List<TextBox> _trustTexts = [];
 
+    private bool _hasUnpublishedChanges;
+    private bool _allowCloseWithoutPrompt;
+
     public EditorForm()
     {
         Text = "Редактор сайта АСОТ";
@@ -114,6 +118,8 @@ public sealed class EditorForm : Form
         LoadCompanyFields();
         LoadTrustFields();
         ReloadSelectors();
+        _hasUnpublishedChanges = HasGitChanges();
+        FormClosing += HandleEditorClosing;
     }
 
     private TabPage BuildTextsTab()
@@ -934,18 +940,176 @@ public sealed class EditorForm : Form
 
     private void RunSave(Action save, string? successMessage = null)
     {
+        var choice = ShowSaveChoiceDialog();
+        using var progress = new ProgressDialog("Идёт локальное изменение");
+
         try
         {
+            progress.Show(this);
+            progress.Refresh();
             save();
             TouchDevServerEntry();
-            SetStatus(successMessage ?? "Готово. Данные добавлены. Обнови вкладку сайта на localhost:3000.", false);
+            _hasUnpublishedChanges = true;
+
+            if (choice == SaveChoice.Publish)
+            {
+                progress.SetText("Идёт отправка на сайт");
+                PublishAllChanges();
+                _hasUnpublishedChanges = false;
+                progress.Close();
+                SetStatus("Готово. Изменения отправлены на сайт.", false);
+                MessageBox.Show(
+                    "Изменения можно проверять на сайте.",
+                    "АСОТ",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            progress.Close();
+            SetStatus(successMessage ?? "Готово. Данные сохранены локально.", false);
+            MessageBox.Show(
+                "Изменения прошли успешно, можно продолжать работать.",
+                "АСОТ",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
         catch (Exception error)
         {
+            progress.Close();
             SetStatus(error.Message, true);
+            MessageBox.Show(error.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
+    private void HandleEditorClosing(object? sender, FormClosingEventArgs eventArgs)
+    {
+        if (_allowCloseWithoutPrompt || !_hasUnpublishedChanges || !HasGitChanges()) return;
+
+        eventArgs.Cancel = true;
+        var choice = ShowCloseChoiceDialog();
+        if (choice == CloseChoice.KeepWorking) return;
+
+        using var progress = new ProgressDialog(choice == CloseChoice.Publish ? "Идёт отправка на сайт" : "Отменяю локальные изменения");
+
+        try
+        {
+            progress.Show(this);
+            progress.Refresh();
+
+            if (choice == CloseChoice.Publish)
+            {
+                PublishAllChanges();
+                MessageBox.Show(
+                    "Изменения можно проверять на сайте.",
+                    "АСОТ",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                DiscardUnpublishedChanges();
+            }
+
+            _hasUnpublishedChanges = false;
+            _allowCloseWithoutPrompt = true;
+            progress.Close();
+            Close();
+        }
+        catch (Exception error)
+        {
+            progress.Close();
+            SetStatus(error.Message, true);
+            MessageBox.Show(error.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private SaveChoice ShowSaveChoiceDialog()
+    {
+        using var dialog = new ChoiceDialog(
+            "Отправить изменения на сайт или продолжить работу",
+            "Отправить",
+            "Продолжить");
+        return dialog.ShowDialog(this) == DialogResult.Yes ? SaveChoice.Publish : SaveChoice.Continue;
+    }
+
+    private CloseChoice ShowCloseChoiceDialog()
+    {
+        using var dialog = new CloseChoiceDialog();
+        return dialog.ShowDialog(this) switch
+        {
+            DialogResult.Yes => CloseChoice.Publish,
+            DialogResult.No => CloseChoice.Discard,
+            _ => CloseChoice.KeepWorking
+        };
+    }
+
+    private void PublishAllChanges()
+    {
+        if (!HasGitChanges()) return;
+
+        RunGit("add", "-A");
+        if (!HasGitChanges()) return;
+
+        RunGit("commit", "-m", $"Update site content {DateTime.Now:yyyy-MM-dd HH:mm}");
+        RunGit("push", "origin", "main");
+    }
+
+    private void DiscardUnpublishedChanges()
+    {
+        try
+        {
+            RunGit("fetch", "origin", "main");
+        }
+        catch
+        {
+            // Если сеть недоступна, откатываемся к уже известному origin/main.
+        }
+
+        RunGit("reset", "--hard", "origin/main");
+        RunGit("clean", "-fd", "--", "editable-data", "src/images");
+    }
+
+    private static bool HasGitChanges()
+    {
+        try
+        {
+            return !string.IsNullOrWhiteSpace(RunGit("status", "--porcelain").Output);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static GitResult RunGit(params string[] args)
+    {
+        var startInfo = new ProcessStartInfo("git")
+        {
+            WorkingDirectory = ProjectRoot,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        startInfo.ArgumentList.Add("-c");
+        startInfo.ArgumentList.Add($"safe.directory={ProjectRoot.Replace('\\', '/')}");
+        foreach (var arg in args) startInfo.ArgumentList.Add(arg);
+
+        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не получилось запустить git.");
+        var output = process.StandardOutput.ReadToEnd();
+        var error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        if (process.ExitCode != 0)
+        {
+            var details = string.IsNullOrWhiteSpace(error) ? output : error;
+            throw new InvalidOperationException($"Git вернул ошибку:\n{details.Trim()}");
+        }
+
+        return new GitResult(output, error);
+    }
     private void SetStatus(string text, bool isError)
     {
         _status.ForeColor = isError ? Color.Firebrick : Color.FromArgb(23, 106, 52);
@@ -1271,6 +1435,153 @@ public sealed class EditorForm : Form
 
     private static string UpperFirst(string value) => string.IsNullOrWhiteSpace(value) ? value : char.ToUpper(value[0]) + value[1..];
 
+    private enum SaveChoice
+    {
+        Publish,
+        Continue
+    }
+
+    private enum CloseChoice
+    {
+        Publish,
+        Discard,
+        KeepWorking
+    }
+
+    private sealed record GitResult(string Output, string Error);
+
+    private sealed class ProgressDialog : Form
+    {
+        private readonly Label _message = new();
+
+        public ProgressDialog(string text)
+        {
+            Text = "АСОТ";
+            Width = 360;
+            Height = 140;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterParent;
+            ControlBox = false;
+            ShowInTaskbar = false;
+
+            _message.Dock = DockStyle.Fill;
+            _message.TextAlign = ContentAlignment.MiddleCenter;
+            _message.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            Controls.Add(_message);
+            SetText(text);
+        }
+
+        public void SetText(string text)
+        {
+            _message.Text = text;
+            _message.Refresh();
+            Refresh();
+            Application.DoEvents();
+        }
+    }
+
+    private class ChoiceDialog : Form
+    {
+        public ChoiceDialog(string message, string primaryText, string secondaryText)
+        {
+            Text = "АСОТ";
+            Width = 440;
+            Height = 180;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterParent;
+            MinimizeBox = false;
+            MaximizeBox = false;
+            ShowInTaskbar = false;
+
+            var label = new Label
+            {
+                Text = message,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                Padding = new Padding(20)
+            };
+
+            var buttons = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                FlowDirection = FlowDirection.RightToLeft,
+                Height = 58,
+                Padding = new Padding(12)
+            };
+
+            var primary = CreateDialogButton(primaryText, DialogResult.Yes, Color.FromArgb(35, 61, 134));
+            var secondary = CreateDialogButton(secondaryText, DialogResult.No, Color.DimGray);
+            buttons.Controls.Add(primary);
+            buttons.Controls.Add(secondary);
+
+            AcceptButton = primary;
+            CancelButton = secondary;
+            Controls.Add(label);
+            Controls.Add(buttons);
+        }
+    }
+
+    private sealed class CloseChoiceDialog : Form
+    {
+        public CloseChoiceDialog()
+        {
+            Text = "АСОТ";
+            Width = 520;
+            Height = 205;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterParent;
+            MinimizeBox = false;
+            MaximizeBox = false;
+            ShowInTaskbar = false;
+
+            var label = new Label
+            {
+                Text = "Есть изменения, которые ещё не отправлены на сайт. Отправить все изменения на сайт?",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
+                Padding = new Padding(24)
+            };
+
+            var buttons = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                FlowDirection = FlowDirection.RightToLeft,
+                Height = 64,
+                Padding = new Padding(12)
+            };
+
+            var publish = CreateDialogButton("Отправить", DialogResult.Yes, Color.FromArgb(35, 61, 134));
+            var discard = CreateDialogButton("Отменить изменения", DialogResult.No, Color.Firebrick);
+            var keepWorking = CreateDialogButton("Продолжить работу", DialogResult.Cancel, Color.DimGray);
+            buttons.Controls.Add(publish);
+            buttons.Controls.Add(discard);
+            buttons.Controls.Add(keepWorking);
+
+            AcceptButton = publish;
+            CancelButton = keepWorking;
+            Controls.Add(label);
+            Controls.Add(buttons);
+        }
+    }
+
+    private static Button CreateDialogButton(string text, DialogResult result, Color color)
+    {
+        var button = new Button
+        {
+            Text = text,
+            DialogResult = result,
+            Width = 145,
+            Height = 34,
+            BackColor = color,
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat,
+            Margin = new Padding(6)
+        };
+        button.FlatAppearance.BorderSize = 0;
+        return button;
+    }
     private sealed record Entry(int Index, string Title)
     {
         public override string ToString() => Title;
