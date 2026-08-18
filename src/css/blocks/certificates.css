@@ -1,0 +1,146 @@
+﻿.certificates {
+  padding-top: 22px;
+  padding-bottom: 58px;
+  text-align: center;
+}
+
+.certificates .container {
+  width: min(880px, calc(100% - 48px));
+}
+
+.certificates h2 {
+  margin-bottom: 24px;
+  font-size: clamp(28px, 2.8vw, 36px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.certificates-window {
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.doc-row {
+  display: flex;
+  align-items: start;
+  gap: 44px;
+  width: max-content;
+  --certificates-loop-width: 632px;
+  animation: certificates-scroll 28s linear infinite;
+  will-change: transform;
+}
+
+.certificates.is-paused .doc-row {
+  animation-play-state: paused;
+}
+
+.doc-row article {
+  flex: 0 0 125px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transform-origin: center top;
+  transition: transform 0.25s ease;
+}
+
+.doc-row article:hover,
+.doc-row article:focus-visible {
+  outline: 0;
+  transform: scale(1.06);
+  z-index: 2;
+}
+
+.doc {
+  position: relative;
+  width: 125px;
+  height: 178px;
+  margin: 0 auto 12px;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+  box-shadow: 0 8px 16px rgba(24, 38, 54, 0.07);
+}
+
+.doc img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.doc-row p {
+  max-width: 125px;
+  margin: 0 auto;
+  color: #111;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.certificate-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 42px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.certificate-modal.is-open {
+  display: flex;
+}
+
+.certificate-modal__content {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  max-width: min(88vw, 560px);
+  color: #fff;
+}
+
+.certificate-modal__content .doc {
+  width: min(58vw, 430px);
+  height: min(82vh, 610px);
+  margin-bottom: 20px;
+  border-color: transparent;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38);
+}
+
+.certificate-modal__content p {
+  max-width: 520px;
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.certificate-modal__close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.certificate-modal-open {
+  overflow: hidden;
+}
+
+@keyframes certificates-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-1 * var(--certificates-loop-width)));
+  }
+}
+

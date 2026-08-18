@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Редактор сайта АСОТ</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <div>
+          <h1>Редактор сайта АСОТ</h1>
+          <p>Выбери вкладку, заполни поля, добавь картинку и нажми «Загрузить».</p>
+        </div>
+        <button class="reload" type="button" data-reload>Обновить данные</button>
+      </header>
+
+      <nav class="tabs" aria-label="Блоки сайта">
+        <button class="tabs__button is-active" type="button" data-tab="certificates">Сертификаты</button>
+        <button class="tabs__button" type="button" data-tab="awards">Грамоты</button>
+        <button class="tabs__button" type="button" data-tab="reviews">Отзывы</button>
+      </nav>
+
+      <section class="panel is-active" data-panel="certificates">
+        <form class="form" data-form="certificates">
+          <h2>Добавить сертификат</h2>
+          <label>Подпись сертификата<input name="caption" required></label>
+          <label>Цвет рамки
+            <select name="color">
+              <option value="blue">Синяя</option>
+              <option value="navy">Темно-синяя</option>
+              <option value="gray">Серая</option>
+              <option value="pink">Розовая</option>
+            </select>
+          </label>
+          <label>Картинка сертификата<input name="file" type="file" accept="image/*" required></label>
+          <button type="submit">Загрузить</button>
+        </form>
+        <div class="list" data-list="certificates"></div>
+      </section>
+
+      <section class="panel" data-panel="awards">
+        <form class="form" data-form="awards">
+          <h2>Добавить грамоту</h2>
+          <label>Подпись грамоты<input name="caption" required></label>
+          <label>Картинка грамоты<input name="file" type="file" accept="image/*" required></label>
+          <button type="submit">Загрузить</button>
+        </form>
+        <div class="list" data-list="awards"></div>
+      </section>
+
+      <section class="panel" data-panel="reviews">
+        <form class="form" data-form="reviews">
+          <h2>Добавить отзыв</h2>
+          <label>Автор/компания<input name="author" required></label>
+          <label>Текст отзыва<textarea name="text" rows="7" required></textarea></label>
+          <button type="submit">Загрузить</button>
+        </form>
+        <div class="list" data-list="reviews"></div>
+      </section>
+
+      <p class="status" data-status></p>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

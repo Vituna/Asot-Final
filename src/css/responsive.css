@@ -1,0 +1,341 @@
+﻿@media (max-width: 940px) {
+  .nav {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .logo,
+  .phone {
+    width: 50%;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .nav-links a {
+    flex: 0 0 auto;
+  }
+
+  .service-grid,
+  .trust-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .service-grid {
+    grid-template-areas:
+      "fire cable"
+      "auto security"
+      "access security"
+      "entry video";
+  }
+
+  .service-card {
+    padding: 42px 34px;
+  }
+
+  .about-grid,
+  .mission-grid,
+  .clients-grid,
+  .contacts {
+    grid-template-columns: 1fr;
+  }
+
+  .contacts {
+    min-height: auto;
+  }
+
+  .map,
+  .map iframe {
+    min-height: 360px;
+  }
+
+  .contact-card {
+    width: min(100% - 48px, 520px);
+    padding: 60px 0;
+    justify-self: start;
+    margin: 0 auto;
+  }
+
+  .note,
+  .mission-text {
+    min-height: auto;
+    padding: 72px 48px;
+  }
+
+  .about-photo,
+  .about-photo img {
+    min-height: 280px;
+  }
+
+  .review-stage {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 18px;
+  }
+
+  .review-arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .review-card {
+    width: min(520px, 78vw);
+  }
+
+  .review-card--far-prev {
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  .review-card--prev {
+    transform: translateX(calc(-50% - 170px)) scale(0.86);
+  }
+
+  .review-card--next {
+    transform: translateX(calc(-50% + 170px)) scale(0.86);
+  }
+
+  .review-card--far-next {
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  .reviews.is-sliding-left .review-card--far-prev {
+    transform: translateX(-50%) scale(0.76);
+  }
+
+  .reviews.is-sliding-left .review-card--prev {
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  .reviews.is-sliding-left .review-card--active {
+    transform: translateX(calc(-50% - 170px)) scale(0.86);
+  }
+
+  .reviews.is-sliding-right .review-card--active {
+    transform: translateX(calc(-50% + 170px)) scale(0.86);
+  }
+
+  .reviews.is-sliding-right .review-card--next {
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  .reviews.is-sliding-left .review-card--far-next {
+    transform: translateX(calc(-50% + 170px)) scale(0.86);
+  }
+
+  .reviews.is-sliding-right .review-card--far-prev {
+    transform: translateX(calc(-50% - 170px)) scale(0.86);
+  }
+
+  .reviews.is-sliding-right .review-card--far-next {
+    transform: translateX(-50%) scale(0.76);
+  }
+}
+
+@media (max-width: 620px) {
+  .container {
+    width: min(100% - 28px, 1030px);
+  }
+
+  .section {
+    padding: 48px 0;
+  }
+
+  .hero {
+    min-height: 620px;
+  }
+
+  .logo,
+  .phone {
+    width: 100%;
+    min-height: 58px;
+  }
+
+  .nav-links a {
+    min-height: 54px;
+    padding: 0 16px;
+  }
+
+  .service-grid,
+  .trust-row {
+    grid-template-columns: 1fr;
+  }
+
+  .service-grid {
+    grid-template-areas:
+      "fire"
+      "cable"
+      "auto"
+      "security"
+      "access"
+      "video"
+      "entry";
+  }
+
+  .service-card {
+    min-height: 170px;
+    padding: 24px 20px;
+  }
+
+  .trust-row {
+    gap: 18px;
+  }
+
+  .certificates .container {
+    width: min(100% - 28px, 880px);
+  }
+
+  .doc-row {
+    gap: 28px;
+  }
+
+  .doc-row article {
+    flex-basis: 112px;
+  }
+
+  .doc {
+    width: 112px;
+    height: 160px;
+  }
+
+  .doc-row p {
+    max-width: 112px;
+    font-size: 10px;
+  }
+
+  .about-grid,
+  .mission-grid,
+  .clients-grid {
+    gap: 36px;
+  }
+
+  .about-photo::before {
+    left: -14px;
+    bottom: -18px;
+    width: 110px;
+    height: 96px;
+  }
+
+  .note,
+  .case,
+  .contact-card,
+  .review-card {
+    padding: 28px;
+  }
+
+  .contact-card {
+    width: calc(100% - 28px);
+    padding: 42px 0;
+  }
+
+  .contact-card h2 {
+    font-size: 36px;
+  }
+
+  .contact-card p,
+  footer p {
+    font-size: 16px;
+  }
+
+  .mission-text {
+    padding: 42px 28px;
+  }
+
+  .clients-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .clients-logo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .client-details {
+    height: auto;
+    min-height: auto;
+    padding: 42px 28px;
+  }
+
+  .review-stage {
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    gap: 8px;
+    min-height: 330px;
+  }
+
+  .review-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .review-card {
+    width: min(100%, 310px);
+    min-height: 280px;
+    padding: 28px;
+  }
+
+  .review-card--far-prev {
+    transform: translateX(-50%) scale(0.76);
+  }
+
+  .review-card--prev {
+    transform: translateX(calc(-50% - 92px)) scale(0.82);
+  }
+
+  .review-card--next {
+    transform: translateX(calc(-50% + 92px)) scale(0.82);
+  }
+
+  .review-card--far-next {
+    transform: translateX(-50%) scale(0.76);
+  }
+
+  .reviews.is-sliding-left .review-card--far-prev {
+    transform: translateX(-50%) scale(0.72);
+  }
+
+  .reviews.is-sliding-left .review-card--prev {
+    transform: translateX(-50%) scale(0.76);
+  }
+
+  .reviews.is-sliding-left .review-card--active {
+    transform: translateX(calc(-50% - 92px)) scale(0.82);
+  }
+
+  .reviews.is-sliding-right .review-card--active {
+    transform: translateX(calc(-50% + 92px)) scale(0.82);
+  }
+
+  .reviews.is-sliding-right .review-card--next {
+    transform: translateX(-50%) scale(0.76);
+  }
+
+  .reviews.is-sliding-left .review-card--far-next {
+    transform: translateX(calc(-50% + 92px)) scale(0.82);
+  }
+
+  .reviews.is-sliding-right .review-card--far-prev {
+    transform: translateX(calc(-50% - 92px)) scale(0.82);
+  }
+
+  .reviews.is-sliding-right .review-card--far-next {
+    transform: translateX(-50%) scale(0.72);
+  }
+
+  .review-card p {
+    font-size: 15px;
+    max-height: 124px;
+  }
+
+  .review-card.is-expanded {
+    max-height: 360px;
+  }
+
+  .review-card.is-expanded p {
+    max-height: 230px;
+  }
+
+  .awards-row {
+    gap: 28px;
+  }
+}
+

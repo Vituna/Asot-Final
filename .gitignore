@@ -1,0 +1,10 @@
+node_modules/
+dist/
+npm-debug.log*
+.vs/
+work/
+outputs/
+tools/content-editor-desktop/bin/
+tools/content-editor-desktop/obj/
+*.user
+*.suo
