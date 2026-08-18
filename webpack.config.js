@@ -1,4 +1,4 @@
-import path from "node:path";
+﻿import path from "node:path";
 import { fileURLToPath } from "node:url";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 export default {
   entry: "./src/index.jsx",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, process.env.VERCEL ? "public" : "dist"),
     filename: "js/[name].[contenthash:8].js",
     assetModuleFilename: "images/[name][ext]",
     clean: true
@@ -77,3 +77,4 @@ export default {
     open: true
   }
 };
+
