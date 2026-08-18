@@ -28,6 +28,7 @@ public sealed class EditorForm : Form
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "ASOT", "content-editor.log");
     private static string ProjectRoot = DefaultProjectRoot;
+    private static readonly string GitExecutable = ResolveGitExecutable();
 
     private readonly Label _status = new();
 
@@ -1115,9 +1116,35 @@ public sealed class EditorForm : Form
         }
     }
 
+    private static string ResolveGitExecutable()
+    {
+        var appDir = AppContext.BaseDirectory;
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var candidates = new List<string>
+        {
+            Path.Combine(appDir, "git", "cmd", "git.exe"),
+            Path.Combine(appDir, "git", "bin", "git.exe"),
+            Path.Combine(appDir, "PortableGit", "cmd", "git.exe"),
+            Path.Combine(appDir, "PortableGit", "bin", "git.exe"),
+            Path.Combine(userProfile, ".cache", "codex-runtimes", "codex-primary-runtime", "dependencies", "native", "git", "cmd", "git.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Git", "cmd", "git.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Git", "bin", "git.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Git", "cmd", "git.exe")
+        };
+
+        var pathVariable = Environment.GetEnvironmentVariable("PATH") ?? "";
+        candidates.AddRange(
+            pathVariable.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => Path.Combine(item.Trim(), "git.exe")));
+
+        var git = candidates.FirstOrDefault(File.Exists);
+        if (!string.IsNullOrWhiteSpace(git)) return git;
+
+        return "git";
+    }
     private static GitResult RunGit(params string[] args)
     {
-        var startInfo = new ProcessStartInfo("git")
+        var startInfo = new ProcessStartInfo(GitExecutable)
         {
             WorkingDirectory = ProjectRoot,
             RedirectStandardOutput = true,
@@ -1130,7 +1157,7 @@ public sealed class EditorForm : Form
         startInfo.ArgumentList.Add($"safe.directory={ProjectRoot.Replace('\\', '/')}");
         foreach (var arg in args) startInfo.ArgumentList.Add(arg);
 
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не получилось запустить git.");
+        using var process = StartGitProcess(startInfo);
         var output = process.StandardOutput.ReadToEnd();
         var error = process.StandardError.ReadToEnd();
         process.WaitForExit();
@@ -1146,6 +1173,20 @@ public sealed class EditorForm : Form
         return new GitResult(output, error);
     }
 
+    private static Process StartGitProcess(ProcessStartInfo startInfo)
+    {
+        try
+        {
+            return Process.Start(startInfo) ?? throw new InvalidOperationException("Не получилось запустить git.");
+        }
+        catch (Exception error) when (error is System.ComponentModel.Win32Exception or FileNotFoundException)
+        {
+            LogError("Git не найден", error);
+            throw new InvalidOperationException(
+                "Программа не нашла Git для отправки изменений. Установи Git for Windows или проверь путь к git.exe. " +
+                $"Сейчас программа пробовала запустить: {GitExecutable}");
+        }
+    }
     private static void LogGit(string[] args, string output, string error, int exitCode)
     {
         try
