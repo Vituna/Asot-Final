@@ -1,0 +1,143 @@
+// Colors
+@black: #000000;
+@white: #FFFFFF;
+@darkblue: #233878;
+@palegrayblue: #EDEFF4;
+@whitesmok: #F4F4F4;
+@bluebuutom: linear-gradient(210.11deg, #233878 33.2%, #244E8E 59.98%, #2586C5 97.96%);
+@silver: #D2D2D2;
+@gray: #787878;
+
+// Viewports
+@desktop-width: 1440px;
+@tablet-width: 768px;
+@mobile-width: 360px;
+
+@font-face {
+  font-family: 'Montserrat300';
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/montserrat-300.woff2);
+}
+
+@font-face {
+  font-family: 'Montserrat400';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/montserrat-400.woff2);
+}
+
+@font-face {
+  font-family: 'Montserrat500';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/montserrat-500.woff2);
+}
+
+@font-face {
+  font-family: 'Montserrat600';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/montserrat-600.woff2);
+}
+
+@font-face {
+  font-family: 'Montserrat700';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/montserrat-700.woff2);
+}
+
+
+@font-face {
+  font-family: 'inter400';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/inter-400.woff2);
+}
+
+@font-face {
+  font-family: 'inter600';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/inter-600.woff2);
+}
+
+@font-face {
+  font-family: 'Inter700';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url(../fonts/inter-700.woff2);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.page {
+  height: 100%;
+  font-size: 17px;
+  line-height: 22px;
+  margin: auto;
+}
+
+.page__body {
+  min-height: 100%;
+  margin: auto;
+
+  // max-width: 100%;
+  color: @black;
+}
+
+@import url("./blocks/header/page-header.less");
+
+@import url("./blocks/header/nav.less");
+
+@import url("./blocks/header/title.less");
+
+@import url("./blocks/header/logo.less");
+
+@import url("./blocks/main/page-main.less");
+@import url("./blocks/main/services.less");
+@import url("./blocks/main/advantages.less");
+@import url("./blocks/main/company.less");
+@import url("./blocks/main/mission.less");
+
+@import url("./blocks/main/evidence.less");
+
+
+
+// @media (min-width: @tablet-width) {
+//   .main-nav__wrapper {
+//     // display: flex;
+//     // justify-content: space-between;
+//     width: 768px;
+//     margin: 0 auto;
+
+//   }
+// }
+
+
+
+// .header__photo {
+//   position: absolute;
+//   z-index: -1;
+
+// }
