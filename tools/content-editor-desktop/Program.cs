@@ -24,6 +24,9 @@ public sealed class EditorForm : Form
     private static readonly string ProjectRootConfig = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "ASOT", "content-editor-project.txt");
+    private static readonly string LogFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "ASOT", "content-editor.log");
     private static string ProjectRoot = DefaultProjectRoot;
 
     private readonly Label _status = new();
@@ -118,7 +121,7 @@ public sealed class EditorForm : Form
         LoadCompanyFields();
         LoadTrustFields();
         ReloadSelectors();
-        _hasUnpublishedChanges = HasGitChanges();
+        _hasUnpublishedChanges = HasUnpublishedWork();
         FormClosing += HandleEditorClosing;
     }
 
@@ -984,7 +987,7 @@ public sealed class EditorForm : Form
 
     private void HandleEditorClosing(object? sender, FormClosingEventArgs eventArgs)
     {
-        if (_allowCloseWithoutPrompt || !_hasUnpublishedChanges || !HasGitChanges()) return;
+        if (_allowCloseWithoutPrompt || !_hasUnpublishedChanges || !HasUnpublishedWork()) return;
 
         eventArgs.Cancel = true;
         var choice = ShowCloseChoiceDialog();
@@ -1046,13 +1049,23 @@ public sealed class EditorForm : Form
 
     private void PublishAllChanges()
     {
-        if (!HasGitChanges()) return;
+        if (HasGitChanges())
+        {
+            RunGit("add", "-A");
+            RunGit("commit", "-m", $"Update site content {DateTime.Now:yyyy-MM-dd HH:mm}");
+        }
 
-        RunGit("add", "-A");
-        if (!HasGitChanges()) return;
+        RunGit("pull", "--rebase", "origin", "main");
 
-        RunGit("commit", "-m", $"Update site content {DateTime.Now:yyyy-MM-dd HH:mm}");
-        RunGit("push", "origin", "main");
+        if (HasUnpushedCommits())
+        {
+            RunGit("push", "origin", "main");
+        }
+
+        if (HasUnpublishedWork())
+        {
+            throw new InvalidOperationException("GitHub не подтвердил отправку изменений. Подробности записаны в content-editor.log.");
+        }
     }
 
     private void DiscardUnpublishedChanges()
@@ -1070,14 +1083,34 @@ public sealed class EditorForm : Form
         RunGit("clean", "-fd", "--", "editable-data", "src/images");
     }
 
+    private static bool HasUnpublishedWork()
+    {
+        return HasGitChanges() || HasUnpushedCommits();
+    }
+
     private static bool HasGitChanges()
     {
         try
         {
             return !string.IsNullOrWhiteSpace(RunGit("status", "--porcelain").Output);
         }
-        catch
+        catch (Exception error)
         {
+            LogError("Не получилось проверить локальные изменения", error);
+            return false;
+        }
+    }
+
+    private static bool HasUnpushedCommits()
+    {
+        try
+        {
+            var count = RunGit("rev-list", "--count", "origin/main..HEAD").Output.Trim();
+            return int.TryParse(count, out var value) && value > 0;
+        }
+        catch (Exception error)
+        {
+            LogError("Не получилось проверить неотправленные коммиты", error);
             return false;
         }
     }
@@ -1105,10 +1138,42 @@ public sealed class EditorForm : Form
         if (process.ExitCode != 0)
         {
             var details = string.IsNullOrWhiteSpace(error) ? output : error;
+            LogGit(args, output, error, process.ExitCode);
             throw new InvalidOperationException($"Git вернул ошибку:\n{details.Trim()}");
         }
 
+        LogGit(args, output, error, process.ExitCode);
         return new GitResult(output, error);
+    }
+
+    private static void LogGit(string[] args, string output, string error, int exitCode)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogFile)!);
+            File.AppendAllText(
+                LogFile,
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] git {string.Join(" ", args)} -> {exitCode}\n{output}{error}\n",
+                new UTF8Encoding(false));
+        }
+        catch
+        {
+        }
+    }
+
+    private static void LogError(string message, Exception error)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogFile)!);
+            File.AppendAllText(
+                LogFile,
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}\n{error}\n",
+                new UTF8Encoding(false));
+        }
+        catch
+        {
+        }
     }
     private void SetStatus(string text, bool isError)
     {
@@ -1580,6 +1645,10 @@ public sealed class EditorForm : Form
             Margin = new Padding(6)
         };
         button.FlatAppearance.BorderSize = 0;
+        button.Click += (_, _) =>
+        {
+            if (button.FindForm() is Form form) form.DialogResult = result;
+        };
         return button;
     }
     private sealed record Entry(int Index, string Title)
