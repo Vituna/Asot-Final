@@ -20,8 +20,8 @@ export const clients = [
   },
   {
     title: "Государственный объект",
-    logoMono: "images/client-mchs.svg",
-    logoColor: "images/client-mchs-color.svg",
+    logoMono: "images/client-mchs-optimized.png",
+    logoColor: "images/client-mchs-color-optimized.png",
     alt: "МЧС России",
     description: "Проектирование и монтаж инженерных систем безопасности для административного комплекса.",
     services: ["пожарной сигнализации", "оповещения", "видеоконтроля"]
@@ -44,8 +44,8 @@ export const clients = [
   },
   {
     title: "Административный объект",
-    logoMono: "images/client-police.svg",
-    logoColor: "images/client-police-color.svg",
+    logoMono: "images/client-police-optimized.png",
+    logoColor: "images/client-police-color-optimized.png",
     alt: "Административный объект",
     description: "Монтаж и пусконаладка систем безопасности в помещениях с постоянным потоком посетителей.",
     services: ["пожарной сигнализации", "охранной сигнализации"]
@@ -82,8 +82,8 @@ export const clients = [
   },
   {
     title: "Всероссийский музей А. С. Пушкина",
-    logoMono: "images/client-image-1.svg",
-    logoColor: "images/client-image-1-color.svg",
+    logoMono: "images/client-image-1-optimized.png",
+    logoColor: "images/client-image-1-color-optimized.png",
     alt: "Всероссийский музей А. С. Пушкина",
     description: "Работы с учетом требований к музейным объектам и сохранности помещений.",
     services: ["охранной сигнализации", "видеоконтроля", "пожарной сигнализации"]

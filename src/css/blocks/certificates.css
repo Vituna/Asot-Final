@@ -130,6 +130,52 @@
   cursor: pointer;
 }
 
+.certificate-modal__nav {
+  position: fixed;
+  top: 72px;
+  bottom: 72px;
+  z-index: 1;
+  width: min(28vw, 220px);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.certificate-modal__nav--prev {
+  left: 0;
+}
+
+.certificate-modal__nav--next {
+  right: 0;
+}
+
+.certificate-modal__nav::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid rgba(255, 255, 255, 0.72);
+  border-left: 2px solid rgba(255, 255, 255, 0.72);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.certificate-modal__nav--prev::before {
+  left: 28px;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.certificate-modal__nav--next::before {
+  right: 28px;
+  transform: translateY(-50%) rotate(135deg);
+}
+
+.certificate-modal__nav:hover::before,
+.certificate-modal__nav:focus-visible::before {
+  opacity: 1;
+}
+
 body.certificate-modal-open {
   overflow: hidden;
 }

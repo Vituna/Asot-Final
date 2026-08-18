@@ -17,6 +17,7 @@ export function App({ data }) {
   const [isRequestOpen, setIsRequestOpen] = useState(false);
 
   const openModal = (item, type) => setModal({ item, type });
+  const modalItems = modal?.type === "award" ? data.awards : data.certificates;
   const closeModal = () => {
     window.dispatchEvent(new CustomEvent("asot-modal-close"));
     setModal(null);
@@ -54,7 +55,13 @@ export function App({ data }) {
         <Contacts company={data.company} />
       </main>
       <Footer />
-      <Modal item={modal?.item} type={modal?.type} onClose={closeModal} />
+      <Modal
+        item={modal?.item}
+        items={modalItems}
+        type={modal?.type}
+        onClose={closeModal}
+        onChange={(item) => setModal((current) => current ? { ...current, item } : current)}
+      />
       <RequestModal isOpen={isRequestOpen} onClose={() => setIsRequestOpen(false)} />
     </>
   );

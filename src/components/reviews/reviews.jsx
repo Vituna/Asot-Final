@@ -6,6 +6,7 @@ export function Reviews({ reviews }) {
   const [expanded, setExpanded] = useState(false);
   const [slideClass, setSlideClass] = useState("");
   const [animating, setAnimating] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
   const slideDuration = 650;
 
   const getIndex = (index) => (index + reviews.length) % reviews.length;
@@ -59,7 +60,17 @@ export function Reviews({ reviews }) {
             <span aria-hidden="true" />
           </button>
 
-          <div className="review-cards reviews-block__cards">
+          <div
+            className="review-cards reviews-block__cards"
+            onTouchStart={(event) => setTouchStart(event.touches[0].clientX)}
+            onTouchEnd={(event) => {
+              if (touchStart === null) return;
+              const distance = event.changedTouches[0].clientX - touchStart;
+              setTouchStart(null);
+              if (Math.abs(distance) < 45) return;
+              slide(distance < 0 ? "next" : "prev", distance < 0 ? active + 1 : active - 1);
+            }}
+          >
             <ReviewCard key={`far-prev-${farPrevIndex}`} review={reviews[farPrevIndex]} position="far-prev" interactive={false} expanded={false} />
             <ReviewCard key={`prev-${prevIndex}`} review={reviews[prevIndex]} position="prev" interactive={false} expanded={false} />
             <ReviewCard key={`active-${active}`} review={reviews[active]} position="active" interactive expanded={expanded} onToggle={() => setExpanded((value) => !value)} />

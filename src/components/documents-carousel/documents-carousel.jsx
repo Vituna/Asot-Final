@@ -48,7 +48,7 @@ export function DocumentsCarousel({ block, title, items, type, onOpen }) {
 
               return (
                 <article
-                  className={type === "award" ? "award-item awards-block__item" : "certificates-block__item"}
+                  className={`${type === "award" ? "award-item awards-block__item" : "certificates-block__item"} ${clone ? "is-clone" : ""}`}
                   role="button"
                   tabIndex={clone ? -1 : 0}
                   aria-hidden={clone ? "true" : undefined}

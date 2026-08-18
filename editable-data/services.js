@@ -5,7 +5,7 @@ export const services = [
   {
     area: "fire",
     device: "smoke",
-    image: "images/service-smoke.svg",
+    image: "images/service-smoke-optimized.png",
     title: "Средств противопожарной защиты",
     items: [
       "Автоматическая установка пожарной сигнализации",
@@ -18,7 +18,7 @@ export const services = [
   {
     area: "cable",
     device: "wifi",
-    image: "images/service-wifi.svg",
+    image: "images/service-wifi-optimized.png",
     title: "Структурированной кабельной системы",
     items: [
       "Локально-вычислительные сети",
@@ -28,7 +28,7 @@ export const services = [
   {
     area: "auto",
     device: "display",
-    image: "images/service-monitor.svg",
+    image: "images/service-monitor-optimized.png",
     title: "Систем автоматизации и диспетчеризации инженерных систем здания",
     items: []
   },
@@ -47,14 +47,14 @@ export const services = [
   {
     area: "access",
     device: "gate",
-    image: "images/service-gate.svg",
+    image: "images/service-gate-optimized.png",
     title: "Систем контроля и управления доступом",
     items: []
   },
   {
     area: "video",
     device: "camera",
-    image: "images/service-camera.svg",
+    image: "images/service-camera-optimized.png",
     title: "Телевизионных систем видеоконтроля",
     items: [
       "Система охранного видеонаблюдения",
@@ -64,7 +64,7 @@ export const services = [
   {
     area: "entry",
     device: "barrier",
-    image: "images/service-barrier.svg",
+    image: "images/service-barrier-optimized.png",
     title: "Систем организации въезда на охраняемую территорию",
     items: []
   }

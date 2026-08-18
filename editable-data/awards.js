@@ -1,19 +1,19 @@
 // Блок "Грамоты и благодарности". Чтобы добавить грамоту, добавь объект image + caption.
 export const awards = [
   {
-    image: "images/award-sber-2019.jpg",
+    image: "images/award-sber-2019-optimized.jpg",
     caption: "Благодарность от Сбербанка, 2019"
   },
   {
-    image: "images/award-sber-2014.jpg",
+    image: "images/award-sber-2014-optimized.jpg",
     caption: "Благодарность от Сбербанка, 2014"
   },
   {
-    image: "images/award-ivangorod-kudryashov.jpg",
+    image: "images/award-ivangorod-kudryashov-optimized.jpg",
     caption: "Благодарность от Администрации МО «Город Ивангород» Кудряшову Д. А."
   },
   {
-    image: "images/award-ivangorod-ishbulatova.jpg",
+    image: "images/award-ivangorod-ishbulatova-optimized.jpg",
     caption: "Благодарность от Администрации МО «Город Ивангород» Ишбулатовой Н. В."
   }
 ];
